@@ -64,10 +64,7 @@ namespace EstimotePlay
 		{
 			
 			// aapt resource value: 0x7f060000
-			public const int myButton = 2131099648;
-			
-			// aapt resource value: 0x7f060001
-			public const int textView1 = 2131099649;
+			public const int textView1 = 2131099648;
 			
 			static Id()
 			{

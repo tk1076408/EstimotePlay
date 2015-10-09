@@ -1,0 +1,103 @@
+<html>
+	<head>
+		<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.js"></script>
+	</head>
+	<body>		
+		<!-- 
+			mint -> living room 
+			ice -> bedroom
+			blueberry -> dining room
+		-->
+				
+		<div id="blueberry">
+			<img src="blueberryPic.jpg" alt="bedroom" style="width:1280px;height:960px;">
+		</div>
+		<div id="ice">
+			<img src="icePic.jpg" alt="dinning room" style="width:1280px;height:960px;">
+		</div>
+		<div id="mint">
+			<img src="mintPic.jpg" alt="living room" style="width:1280px;height:960px;">
+		</div>
+				
+		<script type="text/javascript">
+
+		$(function() {				
+			var blobSas = "https://estimoteplay.blob.core.windows.net/estimoteplay/DistanceInfo?sr=b&sv=2015-02-21&st=2015-10-08T18%3A38%3A55Z&se=2015-10-15T19%3A38%3A55Z&sp=rw&sig=qcFnD8CEdjnZ2pehM%2FCp%2F2qKhV0yClONl1logHPZRUk%3D";
+			
+			var blueberryDiv = $("#blueberry");
+			var iceDiv = $("#ice");
+			var mintDiv = $("#mint");
+			var body = $("body");
+			var flag = false;
+			var timer = null;
+				
+			hideAllDivs();
+			$.ajaxSetup({ cache: false });			
+			body.click(startStop);
+			
+			function startStop()
+			{
+				if (flag)
+				{
+					flag = false;
+					hideAllDivs();
+					clearInterval(timer);
+				}
+				else
+				{
+					flag = true;
+					pollBlob();
+				}
+			}
+			
+			function hideAllDivs()
+			{
+				blueberryDiv.hide();
+				iceDiv.hide();
+				mintDiv.hide();			
+			}
+			
+			function pollBlob() {				
+				timer = setInterval(function(){
+					$.ajax({ url: blobSas, dataType: "json"}).done(function(data) {
+						console.log(data);
+						var sorted = sortDivByDistance(data);					
+						
+						sorted[0].show();
+						sorted[1].hide();
+						sorted[2].hide();											
+					})
+				}, 500);				
+			}
+			/*click(function() {
+				var thirds = $("div").everyThird().css("color", "Red").end().css("font-weight", "bold");
+				console.log(thirds);
+			});*/
+						
+			function sortDivByDistance(data)
+			{
+				var divArr = [blueberryDiv, iceDiv, mintDiv];
+				var distanceArr = [data.blueberry, data.ice, data.mint];
+				
+				var mapped = divArr.map(function(e, i) 
+				{
+					return { element: e, distance: distanceArr[i]};
+				});
+				
+				mapped.sort(function(a, b)
+				{
+					return a.distance - b.distance;
+				});
+				
+				var result = mapped.map(function(e)
+				{
+					return e.element;
+				})
+				
+				return result;
+			}
+		});
+			
+		</script>
+	</body>
+</html>
